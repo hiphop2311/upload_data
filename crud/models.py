@@ -33,3 +33,17 @@ class CsvUpload(models.Model):
     description = models.CharField(max_length=255, blank=True)
     end_date = models.DateTimeField()
     notes = models.CharField(max_length=255, blank=True)
+
+class Data(models.Model):
+    # ... existing fields ...
+    document = models.CharField(max_length=255, )
+    province = models.CharField(max_length=100)  # จังหวัด
+    department = models.CharField(max_length=100)  # หน่วยงานให้ข้อมูล
+    uploader_name = models.CharField(max_length=100)  # ชื่อ-สกุล ผู้อัพโหลดข้อมูล
+    email = models.EmailField()  # อีเมล
+    uploaded_at = models.DateTimeField(auto_now_add=True)  # วันอัพโหลดข้อมูล
+    data_type = models.CharField(max_length=100)  # ประเภทข้อมูล
+    data_char = models.CharField(max_length=100)  # ลักษณะข้อมูล
+    age_range = models.CharField(max_length=100)  # ช่วงอายุ
+    description = models.CharField(max_length=255, blank=True)
+    # ... other fields as needed ...
