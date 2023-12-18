@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Member, Document, Ajax, CsvUpload
+from .models import Member, Document, Ajax, CsvUpload,Data
 import datetime
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -58,8 +58,11 @@ def edit(request, id):
     members = Member.objects.get(id=id)
     context = {'members': members}
     return render(request, 'edit.html', context)
-
-
+@login_required
+def edit_data(request, id):
+    members = Data.objects.get(id=id)
+    context = {'members': members}
+    return render(request, 'edit.html', context)
 @login_required
 def update(request, id):
     member = Member.objects.get(id=id)
@@ -72,7 +75,17 @@ def update(request, id):
     member.save()
     messages.success(request, 'Member was updated successfully!')
     return redirect('/list')
-
+def update_data(request, id):
+    member = Data.objects.get(id=id)
+    member.firstname = request.POST['firstname']
+    member.lastname = request.POST['lastname']
+    member.mobile_number = request.POST['mobile_number']
+    member.description = request.POST['description']
+    member.location = request.POST['location']
+    member.date = request.POST['date']
+    member.save()
+    messages.success(request, 'Member was updated successfully!')
+    return redirect('/list')
 @login_required
 def delete(request, id):
     member = Member.objects.get(id=id)
@@ -99,6 +112,58 @@ def fileupload(request):
         documents = Document.objects.order_by('-uploaded_at')[:3]
         context = {'documents': documents}
     return render(request, 'fileupload.html', context)
+
+# @login_required
+# def dataupload(request):
+#     if request.method == 'POST' and request.FILES['myfile']:
+#         myfile = request.FILES['myfile']
+#         fs = FileSystemStorage()
+#         # member = Member(
+#         #     firstname=request.POST['firstname'],
+#         #     lastname=request.POST['lastname'],
+#         #     mobile_number=request.POST['mobile_number'],
+#         #     description=request.POST['description'],
+#         #     location=request.POST['location'],
+#         #     date=request.POST['date'],
+#         #     created_at=datetime.datetime.now(),
+#         #     updated_at=datetime.datetime.now(), )
+#         # try:
+#         #     member.full_clean()
+#         # except ValidationError as e:
+#         #     pass
+#         document = Data(
+#             description=request.POST['description'],
+#             document=myfile.name,
+#             uploaded_at=datetime.datetime.now(), )
+#         document.save()
+#         messages.success(request, 'File uploaded successfully!')
+#         filename = fs.save(myfile.name, myfile)
+#         uploaded_file_url = fs.url(filename)
+#         return redirect('dataupload')
+#     else:
+#         documents = Document.objects.order_by('-uploaded_at')[:3]
+#         context = {'documents': documents}
+#     return render(request, 'dataupload.html', context)
+def create_data(request):
+    if request.method == 'POST':
+        member = Member(
+            firstname=request.POST['firstname'],
+            lastname=request.POST['lastname'],
+            mobile_number=request.POST['mobile_number'],
+            description=request.POST['description'],
+            location=request.POST['location'],
+            date=request.POST['date'],
+            created_at=datetime.datetime.now(),
+            updated_at=datetime.datetime.now(), )
+        try:
+            member.full_clean()
+        except ValidationError as e:
+            pass
+        member.save()
+        messages.success(request, 'Member was created successfully!')
+        return redirect('/list')
+    else:
+        return render(request, 'add_data.html')
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
